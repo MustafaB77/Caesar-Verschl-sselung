@@ -1,0 +1,110 @@
+package main;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
+public class CaesarVerschluesselung implements ActionListener {
+	JFrame frame = new JFrame("Caesar Verschlüsselung");
+	JTextArea textArea = new JTextArea(20, 40);
+	JButton verschluesseln = new JButton("Verschlüsseln");
+	JButton entschluesseln = new JButton("Entschlüsseln");
+	JTextField textFeld = new JTextField(36);
+	JTextField zahlFeld = new JTextField(3);
+	JPanel panel = new JPanel();
+	JScrollPane scroll = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+			JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+	public static void main(String[] args) {
+		new CaesarVerschluesselung();
+	}
+
+	public CaesarVerschluesselung() {
+
+		createUI();
+	}
+
+	public void createUI() {
+		
+		// Objekte
+		panel.add(scroll);
+
+		// Text Fields & Areas
+		textArea.setEditable(false);
+		textFeld.setUI(new JTextFieldHintUI("Bitte geben Sie einen Text hier ein..", Color.gray));
+		zahlFeld.setUI(new JTextFieldHintUI("Zahl", Color.gray));
+		
+
+		// Frame Eigenschaften
+		frame.setSize(490, 455);
+		frame.setLocation(225, 300);
+		frame.setLayout(new FlowLayout());
+		frame.setResizable(true);
+		frame.add(scroll);
+		frame.add(textFeld);
+		frame.add(zahlFeld);
+		frame.add(verschluesseln);
+		frame.add(entschluesseln);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+
+		// Buttons Eigenschaften
+		verschluesseln.setPreferredSize(new Dimension(120, 19));
+		verschluesseln.addActionListener(this);
+		verschluesseln.setActionCommand("cipher");
+		entschluesseln.setPreferredSize(new Dimension(120, 19));
+		entschluesseln.addActionListener(this);
+		entschluesseln.setActionCommand("decipher");
+
+	}
+
+	public void actionPerformed(ActionEvent event) {
+		String action = event.getActionCommand();
+		String text = textFeld.getText();
+		int VZahl = 0;
+		try {
+			VZahl = Integer.parseInt(zahlFeld.getText());
+		} catch (Exception z) {
+			JOptionPane.showMessageDialog(null, "Bitte geben Sie eine Zahl in das rechte Feld ein!", "Fehler",
+					JOptionPane.WARNING_MESSAGE);
+
+		}
+		String verschlüsselterText = "";
+		for (char character : text.toCharArray()) {
+
+			int charAsciiNumber = (int) character;
+			boolean eingabe = (charAsciiNumber >= 0) && (charAsciiNumber <= 127);
+			if (character == ' ') {
+				verschlüsselterText += character;
+				continue;
+			}
+			switch (action) {
+			case "cipher":
+				int newCharacter = charAsciiNumber + VZahl;
+				if (eingabe) {
+					while (newCharacter > 127) {
+						newCharacter -= 127;
+					}
+				}
+				verschlüsselterText = verschlüsselterText + ((char) newCharacter);
+				break;
+			case "decipher":
+				int newmCharacter = charAsciiNumber - VZahl;
+				if (eingabe) {
+					while (newmCharacter < 0) {
+						newmCharacter += 127;
+					}
+				}
+				verschlüsselterText = verschlüsselterText + ((char) newmCharacter);
+				break;
+			}
+		}
+		textArea.setText(verschlüsselterText + "\n");
+	}
+}
